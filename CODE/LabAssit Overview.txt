@@ -1,0 +1,104 @@
+LabAssit Overview
+
+AI chatbot trained on lab protocols to provide bench scientist with real time SOP support
+
+1) Environment Setup
+
+
+2) Document Processing Pipeline
+	Extract and clean text from protocol docs
+
+•	Text extraction from PDFs, Word docs, etc.
+•	Text cleaning and preprocessing
+•	Document chunking (splitting into manageable pieces)
+•	Metadata preservation (document names, section headers) ??
+
+	Chunking Strategy for Protocols:
+	•	Split by protocol steps or sections rather than arbitrary character limits
+	•	Preserve context by including section headers with each chunk
+	•	Typical chunk size: 500-1000 tokens with 100-200 token overlap
+
+
+Step 3: Embedding Generation and Vector Storage
+Process:
+1.	Convert text chunks into numerical vectors (embeddings) using sentence-transformers
+2.	Create indexes for fast similarity search
+Embedding Model Selection:
+•	all-MiniLM-L6-v2 - Good general purpose, fast
+•	all-mpnet-base-v2 - Better quality, slightly slower
+•	Consider domain-specific biomedical models if available
+
+
+Step 4: Retrieval System
+	Similarity Search Process:
+	1.	Convert user query to embedding
+	2.	Search vector database for most similar document chunks
+	3.	Retrieve top 3-5 most relevant protocol sections
+	4.	Rank results by relevance score
+	Retrieval Strategies:
+	•	Semantic similarity (vector search)
+	•	Keyword filtering for specific protocols or techniques
+	•	Hybrid search combining both approaches
+
+
+Step 5: Claude Integration
+	Context Assembly:
+	1.	Take user question
+	2.	Retrieve relevant protocol sections
+	3.	Format context for Claude
+	4.	Send combined prompt to Claude API
+	5.	Return response to user
+	Prompt Structure:
+	System: You are an expert CRISPR research assistant...
+
+	Context from lab protocols:
+	[Retrieved protocol sections here]
+
+	User Question: [User's question]
+
+	Instructions: Answer based on the provided protocols...
+
+
+Step 6: User Interface
+	Streamlit Chat Interface:
+	•	Session state management for conversation history
+	•	File upload for adding new protocols
+	•	Display of source protocol sections used in responses
+	•	Conversation history persistence
+
+
+Step 7: Implementation Flow
+	Initialization (One-time):
+	1.	Load and process all protocol documents
+	2.	Generate embeddings for all chunks
+	3.	Store in vector database
+	4.	Save indexes for future use
+	Runtime (Per Query):
+	1.	User submits question via Streamlit interface
+	2.	Generate embedding for user query
+	3.	Search vector database for relevant protocols
+	4.	Retrieve top matching protocol sections
+	5.	Combine with user question in Claude prompt
+	6.	Call Claude API
+	7.	Display response with source citations
+
+
+
+Step 8: Advanced Features to Consider
+	Source Citation: Track which protocol sections were used and display them to users
+	Protocol Updates: System to easily add new protocols or update existing ones
+	Query Expansion: Expand user queries with domain-specific terminology
+	Conversation Memory: Maintain context across multiple questions in a session
+	Access Control: If needed, restrict access to certain protocols based on user permissions
+
+
+Step 9: Testing and Validation
+	Test Cases:
+	•	Questions about specific CRISPR techniques
+	•	Protocol troubleshooting scenarios
+	•	Cross-referencing between different protocols
+	•	Edge cases with ambiguous queries
+	Evaluation Metrics:
+	•	Retrieval accuracy (are the right protocols found?)
+	•	Response quality (are Claude's answers helpful and accurate?)
+	•	Source attribution (can users trace answers back to specific protocols?)

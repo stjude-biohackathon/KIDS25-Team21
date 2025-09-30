@@ -1,0 +1,6 @@
+requirements
+
+pip install pymupdf
+pip install langchain
+pip install ollama
+pip install chromadb
